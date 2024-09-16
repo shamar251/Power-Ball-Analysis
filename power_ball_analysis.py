@@ -3,8 +3,6 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from typing import Counter
 import seaborn as sns
-from scipy.stats import chisquare
-
 
 
 def get_most_recurring_winning_numbers(top_n):
@@ -109,67 +107,6 @@ def visualize_top_recurring_numbers_by_section(section_data_dict):
     plt.tight_layout()
     plt.show()
 
-def chi_square_test_lottery(data_path, section):
-    '''
-    Performs a Chi-Square Goodness-of-Fit Test for lottery numbers in a given section.
-    
-    Parameters:
-    - data_path: path to the CSV file containing lottery data.
-    - section: the section of the lottery numbers to analyze (1-6).
-    
-    Returns:
-    - chi-square statistic and p-value.
-    '''
-    
-    # Read the dataset
-    df = pd.read_csv(data_path)
-    
-    # Extract the winning numbers column
-    winning_numbers = df['Winning Numbers'].values.tolist()
-    
-    # Split the winning numbers by spaces and select the chosen section
-    section_numbers = [int(num.split()[section - 1]) for num in winning_numbers]
-    
-    # Get observed frequencies
-    observed_frequencies = Counter(section_numbers)
-    
-    # Number of unique possible numbers (assuming lottery numbers range from 1-69)
-    total_numbers = 69
-    
-    # Total number of draws
-    total_draws = len(section_numbers)
-    
-    # Expected frequency: uniform distribution, i.e., each number should appear equally often
-    expected_frequency = total_draws / total_numbers
-    
-    # Create lists of observed and expected frequencies for each number from 1 to 69
-    observed = []
-    expected = []
-    
-    for num in range(1, total_numbers + 1):
-        observed.append(observed_frequencies.get(num, 0))
-        expected.append(expected_frequency)
-    
-    # Perform the Chi-Square Goodness-of-Fit Test
-    chi_statistic, p_value = chisquare(f_obs=observed, f_exp=expected)
-
-    chi_statistic = round(chi_statistic, 2)
-    #p_value = round(p_value, 1)
-
-    print(f'Chi-Square Statistic: {chi_statistic}')
-    print(f'P-Value: {p_value}')
-
-    if p_value < 0.05:
-        pass #print("The lottery numbers in this section deviate from a random distribution (p < 0.05).")
-    else:
-        pass #print("The lottery numbers in this section do not significantly deviate from a random distribution (p >= 0.05).")
-    
-    chi_statistic = f'Chi-Square Statistic: {chi_statistic}'
-    p_value = f'P-Value: {p_value}'
-    
-    
-    return chi_statistic, p_value
-
 
 
 
@@ -177,21 +114,13 @@ def main():
     
     # top_recurring_numbers = get_most_recurring_winning_numbers(10)
     # visualize_top_recurring_winning_numbers(top_recurring_numbers)
-
-    # section_data = {}
-
-    # for section in range(1, 7):
-    #     top_recurring_numbers = get_most_recurring_winning_number_by_section(section, 5)
-    #     section_data[section] = top_recurring_numbers
-    
-    # visualize_top_recurring_numbers_by_section(section_data)
-
-    chi_square_results = {}
+    section_data = {}
 
     for section in range(1, 7):
-        chi_square_results[section] = chi_square_test_lottery('Lottery_Powerball_Winning_Numbers__Beginning_2010.csv', section)
-
-    print(chi_square_results)
+        top_recurring_numbers = get_most_recurring_winning_number_by_section(section, 5)
+        section_data[section] = top_recurring_numbers
+    
+    visualize_top_recurring_numbers_by_section(section_data)
 
 
 
